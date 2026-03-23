@@ -1,6 +1,6 @@
 import asyncio, os, time, json, logging
 from fastapi import FastAPI, Request, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
@@ -69,8 +69,23 @@ Return ONLY a JSON object with this exact structure, no markdown:
 }"""
 
 
+_HCL_EXAMPLE = (
+    'resource "aws_s3_bucket" "data" {\n'
+    '  bucket = "my-company-data"\n'
+    '}\n\n'
+    'resource "aws_s3_bucket_acl" "data" {\n'
+    '  bucket = aws_s3_bucket.data.id\n'
+    '  acl    = "public-read"\n'
+    '}'
+)
+
+
 class HCLRequest(BaseModel):
-    hcl: str
+    hcl: str = Field(
+        ...,
+        description="Terraform HCL code or .tf file contents to analyze. Paste your resource definitions, modules, or full configuration files.",
+        example=_HCL_EXAMPLE,
+    )
 
 
 def check_secret(request: Request):
@@ -83,7 +98,18 @@ async def health():
     return {"status": "ok", "service": "terraguard"}
 
 
-@app.post("/analyze")
+@app.post(
+    "/analyze",
+    summary="Analyze Terraform HCL for security issues",
+    description=(
+        "Scans Terraform HCL code for security misconfigurations including overly permissive IAM policies, "
+        "open Security Groups (0.0.0.0/0), unencrypted storage, public access on private resources, "
+        "missing logging, insecure protocols, and compliance gaps.\n\n"
+        "**Input:** Pass your `.tf` file contents in the `hcl` field.\n\n"
+        "**Returns:** Risk level (CRITICAL/HIGH/MEDIUM/LOW/INFO), list of issues with severity and fix recommendations, "
+        "and a list of passed security checks."
+    ),
+)
 async def analyze(body: HCLRequest, request: Request):
     check_secret(request)
     if len(body.hcl) > MAX_LEN:
@@ -122,7 +148,17 @@ async def analyze(body: HCLRequest, request: Request):
         raise HTTPException(status_code=502, detail="Failed to parse analysis response")
 
 
-@app.post("/secrets")
+@app.post(
+    "/secrets",
+    summary="Detect hardcoded secrets in Terraform HCL",
+    description=(
+        "Scans Terraform HCL code for hardcoded secrets, credentials, and sensitive values — "
+        "including API keys, passwords, tokens, connection strings, and certificates.\n\n"
+        "**Input:** Pass your `.tf` file contents in the `hcl` field.\n\n"
+        "**Returns:** List of findings with severity, type, location in code, and remediation advice "
+        "(e.g. use AWS SSM Parameter Store, HashiCorp Vault, or Terraform variables)."
+    ),
+)
 async def secrets(body: HCLRequest, request: Request):
     check_secret(request)
     if len(body.hcl) > MAX_LEN:

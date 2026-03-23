@@ -9,9 +9,14 @@
 </p>
 
 <p align="center">
+  <a href="https://rapidapi.com/terrycrews99/api/terraguard"><img src="https://img.shields.io/badge/RapidAPI-TerraGuard-blue?style=flat-square&logo=rapid" alt="RapidAPI"/></a>
   <img src="https://img.shields.io/badge/python-3.12-blue?style=flat-square"/>
   <img src="https://img.shields.io/badge/fastapi-0.115-green?style=flat-square"/>
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"/>
+</p>
+
+<p align="center">
+  <a href="https://rapidapi.com/terrycrews99/api/terraguard"><strong>→ Get API Access on RapidAPI</strong></a>
 </p>
 
 ---

@@ -99,6 +99,11 @@ async def analyze(body: HCLRequest, request: Request):
     )
     elapsed = time.monotonic() - t0
     raw = resp.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
     log.info(f"analyze done elapsed={elapsed:.3f}s")
     try:
         return json.loads(raw)
@@ -123,6 +128,11 @@ async def secrets(body: HCLRequest, request: Request):
     )
     elapsed = time.monotonic() - t0
     raw = resp.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
     log.info(f"secrets done elapsed={elapsed:.3f}s")
     try:
         return json.loads(raw)

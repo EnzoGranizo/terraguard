@@ -226,18 +226,6 @@ for issue in result.get("issues", []):
 
 ---
 
-## Pricing
-
-Available on [RapidAPI](https://rapidapi.com/terrycrews99/api/terraguard):
-
-| Plan | Price | Requests/month |
-|------|-------|----------------|
-| Free | $0 | 30 |
-| Pro ⭐ | $19 | 500 |
-| Ultra | $59 | 5,000 |
-
----
-
 ## License
 
 MIT
